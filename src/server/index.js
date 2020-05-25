@@ -1,12 +1,14 @@
-require('ignore-styles');
+require("ignore-styles");
 
-require('@babel/register')({
+require("@babel/polyfill");
+
+require("@babel/register")({
   presets: ["@babel/preset-env", "@babel/preset-react"],
 });
 
-require('asset-require-hook')({
-  extensions: ['jpg', 'png', 'gif'],
-  name: '/assets/[hash].[ext]',
+require("asset-require-hook")({
+  extensions: ["jpg", "png", "gif"],
+  name: "/assets/[hash].[ext]",
 });
 
-require('./server');
+require("./server");
