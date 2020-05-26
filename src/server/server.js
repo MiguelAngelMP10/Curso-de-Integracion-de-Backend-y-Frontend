@@ -10,13 +10,13 @@ import { StaticRouter } from "react-router-dom";
 import { renderRoutes } from "react-router-config";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
+import cookieParser from "cookie-parser";
 import reducer from "../frontend/reducers";
 import Layout from "../frontend/components/Layout";
 import initialState from "../frontend/initialState";
 import serverRoutes from "../frontend/routes/serverRoutes";
 import getManifest from "./getManifest";
 
-import cookeParser from "cookie-parser";
 import boom from "@hapi/boom";
 import passport from "passport";
 import axios from "axios";
@@ -27,7 +27,7 @@ const app = express();
 const { ENV, PORT } = process.env;
 
 app.use(express.json());
-app.use(cookeParser());
+app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -112,9 +112,6 @@ app.post("/auth/sign-in", async function (req, res, next) {
           }
 
           const { token, ...user } = data;
-
-          // Si el atributo rememberMe es verdadero la expiración será en 30 dias
-          // de lo contrario la expiración será en 2 horas
           res.cookie("token", token, {
             httpOnly: !config.dev,
             secure: !config.dev,
@@ -130,17 +127,25 @@ app.post("/auth/sign-in", async function (req, res, next) {
   })(req, res, next);
 });
 
-app.post("/auth/sign-up", async function (req, res, next) {
+app.post("/auth/sign-up/", async function (req, res, next) {
   const { body: user } = req;
 
   try {
-    await axios({
-      url: `${config.apiUrl}/api/auth/sign-up`,
+    const userData = await axios({
+      url: `${process.env.API_URL}/api/auth/sign-up`,
       method: "post",
-      data: user,
+      data: {
+        email: user.email,
+        name: user.name,
+        password: user.password,
+      },
     });
 
-    res.status(201).json({ message: "user created" });
+    res.status(201).json({
+      name: req.body.name,
+      email: req.body.email,
+      id: userData.data.id,
+    });
   } catch (error) {
     next(error);
   }
