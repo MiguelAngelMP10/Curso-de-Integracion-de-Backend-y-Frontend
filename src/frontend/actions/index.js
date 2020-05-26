@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-shadow */
 import axios from "axios";
 
 export const setFavorite = (payload) => ({
@@ -68,6 +70,32 @@ export const loginUser = ({ email, password }, redirectUrl) => {
       })
       .catch((err) => dispatch(setError(err)));
   };
+};
+
+export const favoriteMovie = (userId, movie, cb) => (dispatch) => {
+  const data = {
+    userId,
+    movieId: movie.id,
+  };
+  axios({
+    url: "/user-movies",
+    method: "post",
+    data,
+  })
+    .then(({ data }) => {
+      const {
+        data: { movieExist },
+      } = data;
+
+      const message = movieExist
+        ? `${movie.title} ya esta en tus favoritos`
+        : `${movie.title} fue agregada a tus favoritos`;
+
+      !movieExist && dispatch(setFavorite(movie));
+
+      cb(movieExist, message);
+    })
+    .catch((err) => dispatch(setError(err)));
 };
 
 export { setFavorite as default };

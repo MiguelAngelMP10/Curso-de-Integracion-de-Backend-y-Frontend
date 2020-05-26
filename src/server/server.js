@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-console */
 /* eslint-disable func-names */
 /* eslint-disable global-require */
@@ -12,14 +13,13 @@ import { renderRoutes } from "react-router-config";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import cookieParser from "cookie-parser";
+import boom from "@hapi/boom";
+import passport from "passport";
+import axios from "axios";
 import reducer from "../frontend/reducers";
 import Layout from "../frontend/components/Layout";
 import serverRoutes from "../frontend/routes/serverRoutes";
 import getManifest from "./getManifest";
-
-import boom from "@hapi/boom";
-import passport from "passport";
-import axios from "axios";
 
 dotenv.config();
 
@@ -89,8 +89,26 @@ const renderApp = async (req, res) => {
       headers: { Authorization: `Bearer ${token}` },
       method: "get",
     });
-
     movieList = movieList.data.data;
+
+    let userMovies = await axios({
+      url: `${process.env.API_URL}/api/user-movies?userId=${id}`,
+      headers: { Authorization: `Bearer ${token}` },
+      method: "get",
+    });
+    const myList = [];
+
+    userMovies = userMovies.data.data;
+
+    if (userMovies.length > 0) {
+      userMovies.forEach((userMovie) => {
+        movieList.forEach((movie) => {
+          if (movie._id === userMovie.movieId) {
+            myList.push(movie);
+          }
+        });
+      });
+    }
 
     initialState = {
       user: {
@@ -98,7 +116,7 @@ const renderApp = async (req, res) => {
         name,
         id,
       },
-      myList: [],
+      myList,
       trends: movieList.filter(
         (movie) => movie.contentRating === "PG" && movie._id
       ),
@@ -182,6 +200,34 @@ app.post("/auth/sign-up/", async function (req, res, next) {
       email: req.body.email,
       id: userData.data.id,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/user-movies", async function (req, res, next) {
+  try {
+    const { body: userMovie } = req;
+    const { token } = req.cookies;
+
+    const { data, status } = await axios({
+      url: `${process.env.API_URL}/api/user-movies`,
+      headers: { Authorization: `Bearer ${token}` },
+      method: "post",
+      data: userMovie,
+    });
+
+    const {
+      data: { movieExist },
+    } = data;
+
+    if (status !== 200 && status !== 201) {
+      return next(boom.badImplementation());
+    }
+
+    const statusCode = movieExist ? 200 : 201;
+
+    return res.status(statusCode).json(data);
   } catch (error) {
     next(error);
   }
