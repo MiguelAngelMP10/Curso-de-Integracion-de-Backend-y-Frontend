@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable func-names */
 /* eslint-disable global-require */
 import express from "express";
@@ -92,9 +93,9 @@ const renderApp = (req, res) => {
   res.send(setResponse(html, preloadedState, req.hashManifest));
 };
 
-app.post("/auth/sign-in", async function (req, res, next) {
+app.post("/auth/sign-in/", async function (req, res, next) {
   // Obtenemos el atributo rememberMe desde el cuerpo del request
-  const { rememberMe } = req.body;
+  // const { rememberMe } = req.body;
   passport.authenticate("basic", function (error, data) {
     try {
       if (error || !data) {
@@ -106,22 +107,22 @@ app.post("/auth/sign-in", async function (req, res, next) {
         {
           session: false,
         },
-        async function (error) {
-          if (error) {
-            next(error);
+        async function (err) {
+          if (err) {
+            next(err);
           }
 
           const { token, ...user } = data;
           res.cookie("token", token, {
-            httpOnly: !config.dev,
-            secure: !config.dev,
-            maxAge: rememberMe ? THIRTY_DAYS_IN_SEC : TWO_HOURS_IN_SEC,
+            httpOnly: !(ENV === "development"),
+            secure: !(ENV === "development"),
+            // maxAge: rememberMe ? THIRTY_DAYS_IN_SEC : TWO_HOURS_IN_SEC,
           });
 
           res.status(200).json(user);
         }
       );
-    } catch (error) {
+    } catch (err) {
       next(error);
     }
   })(req, res, next);

@@ -19,7 +19,7 @@ passport.use(
           username: email,
         },
         data: {
-          apiKeyToken: API_KEY_TOKEN,
+          apiKeyToken: process.env.API_KEY_TOKEN,
         },
       });
 
