@@ -1,28 +1,31 @@
-const path = require('path');
-const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CompressionPlugin = require('compression-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
+const ManifestPlugin = require("webpack-manifest-plugin");
 
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 
 dotenv.config();
 
-const isDev = (process.env.ENV === 'development');
-const entry = ['./src/frontend/index.js'];
+const isDev = process.env.ENV === "development";
+const entry = ["./src/frontend/index.js"];
 
-if (isDev) entry.push('webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true')
+if (isDev)
+  entry.push(
+    "webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true"
+  );
 
 module.exports = {
-  mode: isDev ? 'development' : 'production',
+  mode: isDev ? "development" : "production",
   entry,
   output: {
-    path: isDev ? '/' : path.resolve(__dirname, 'src/server/public'),
-    filename: isDev ? 'assets/app.js' : 'assets/app-[hash].js',
-    "publicPath": '/',
+    path: isDev ? "/" : path.resolve(__dirname, "src/server/public"),
+    filename: isDev ? "assets/app.js" : "assets/app-[hash].js",
+    publicPath: "/",
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: [".js", ".jsx"],
   },
   module: {
     rules: [
@@ -30,7 +33,7 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
         },
       },
       {
@@ -39,36 +42,37 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
           },
-          'css-loader',
-          'sass-loader'
-        ]
+          "css-loader",
+          "sass-loader",
+        ],
       },
       {
         test: /\.(png|gif|jpg)$/,
         use: [
           {
-            'loader': 'file-loader',
+            loader: "file-loader",
             options: {
-              name: 'assets/[hash].[ext]',
+              name: "assets/[hash].[ext]",
             },
           },
-        ]
-      }
+        ],
+      },
     ],
   },
   devServer: {
     historyApiFallback: true,
   },
   plugins: [
-    isDev ? new webpack.HotModuleReplacementPlugin() : () => { },
+    isDev ? new webpack.HotModuleReplacementPlugin() : () => {},
     new MiniCssExtractPlugin({
-      filename: isDev ? 'assets/app.css' : 'assets/app-[hash].css',
+      filename: isDev ? "assets/app.css" : "assets/app-[hash].css",
     }),
-    isDev ? () => { } :
-      new CompressionPlugin({
-        test: /\.js$|\.css$/,
-        filename: '[path].gz',
-      }),
-    isDev ? () => { } : new ManifestPlugin(),
+    isDev
+      ? () => {}
+      : new CompressionPlugin({
+          test: /\.js$|\.css$/,
+          filename: "[path].gz",
+        }),
+    isDev ? () => {} : new ManifestPlugin(),
   ],
 };
