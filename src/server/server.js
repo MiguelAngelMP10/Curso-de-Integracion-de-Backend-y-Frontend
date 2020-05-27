@@ -30,6 +30,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static(`${__dirname}/public`));
 
 require("./utils/auth/strategies/basic");
 
