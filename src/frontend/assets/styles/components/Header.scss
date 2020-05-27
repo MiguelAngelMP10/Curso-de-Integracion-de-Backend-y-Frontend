@@ -1,4 +1,4 @@
-@import "../Vars.scss";
+@import "../vars.scss";
 
 .header {
   align-items: center;
@@ -11,7 +11,8 @@
   width: 100%;
 }
 
-.isLogin, .isRegister {
+.isLogin,
+.isRegister {
   background-color: #21c08b;
 }
 
@@ -21,7 +22,7 @@
 }
 
 .header__menu {
-	margin-right: 30px;
+  margin-right: 30px;
 }
 
 .header__menu ul {
@@ -34,8 +35,9 @@
   text-align: right;
 }
 
-.header__menu:hover ul, ul:hover {
-	display: block;
+.header__menu:hover ul,
+ul:hover {
+  display: block;
 }
 
 .header__menu li {
