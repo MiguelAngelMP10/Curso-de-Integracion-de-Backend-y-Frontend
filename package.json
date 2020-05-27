@@ -2,6 +2,9 @@
   "name": "react-base",
   "version": "1.0.0",
   "description": "React Base",
+  "engines": {
+    "node": "12.16.x"
+  },
   "main": "index.js",
   "scripts": {
     "build": "webpack-cli --config webpack.config.js --colors",
