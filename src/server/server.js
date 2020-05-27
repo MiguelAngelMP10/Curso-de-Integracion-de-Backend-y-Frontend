@@ -43,7 +43,7 @@ if (ENV === "development") {
   app.use(webpackHotMiddleware(compiler));
 } else {
   app.use((req, res, next) => {
-    if (!req.hashManifest) req.hashManifest = getManifest();
+    req.hashManifest = getManifest();
     next();
   });
   app.use(helmet());
